@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="stopwatch">
+        <div id="display">00:00:00.000</div>
+        <button class="start" onclick="startStopwatch()">Start</button>
+        <button class="stop" onclick="stopStopwatch()">Stop</button>
+        <button class="reset" onclick="resetStopwatch()">Reset</button>
+        <button class="lap" onclick="saveLap()">Lap</button>
+        <ul id="laps"></ul>
+    </div>
+
+    <script>
+        let timer;
+        let startTime;
+        let running = false;
+        let elapsedTime = 0;
+        let laps = [];
+
+        function updateDisplay(time) {
+            const hours = String(Math.floor(time / 3600000)).padStart(2, '0');
+            const minutes = String(Math.floor((time % 3600000) / 60000)).padStart(2, '0');
+            const seconds = String(Math.floor((time % 60000) / 1000)).padStart(2, '0');
+            const milliseconds = String(time % 1000).padStart(3, '0');
+            document.getElementById('display').innerText = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+        }
+
+        function startStopwatch() {
+            if (!running) {
+                startTime = Date.now() - elapsedTime;
+                timer = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay(elapsedTime);
+                }, 10);
+                running = true;
+            }
+        }
+
+        function stopStopwatch() {
+            if (running) {
+                clearInterval(timer);
+                running = false;
+            }
+        }
+
+        function resetStopwatch() {
+            clearInterval(timer);
+            running = false;
+            elapsedTime = 0;
+            laps = [];
+            updateDisplay(elapsedTime);
+            document.getElementById('laps').innerHTML = '';
+        }
+
+        function saveLap() {
+            if (running) {
+                laps.push(elapsedTime);
+                const lapTime = document.createElement('li');
+                const hours = String(Math.floor(elapsedTime / 3600000)).padStart(2, '0');
+                const minutes = String(Math.floor((elapsedTime % 3600000) / 60000)).padStart(2, '0');
+                const seconds = String(Math.floor((elapsedTime % 60000) / 1000)).padStart(2, '0');
+                const milliseconds = String(elapsedTime % 1000).padStart(3, '0');
+                lapTime.innerText = `Lap ${laps.length}: ${hours}:${minutes}:${seconds}.${milliseconds}`;
+                document.getElementById('laps').appendChild(lapTime);
+            }
+        }
+    </script>
+</body>
+</html>
